@@ -7,7 +7,6 @@ function getListItem() {
         $(".product").append(`<tr>
           <td>${item.proid}</td>
           <td>${item.proname}</td>
-          <td><img class="image-content" src="/project/img/${item.proimage}"/></td>
           <td>${item.proprice}</td>
           <td>${item.proqty}</td>
           <td>
@@ -50,7 +49,6 @@ $(document).ready(function(){
         $('#inputname').val('');
         $('#inputprice').val('');
         $('#inputqty').val('');
-        $('#inputimage').val('');
     }
 
 // get list item
@@ -61,13 +59,11 @@ $('.store').click(function () {
     var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
 
     var proname = $('#inputname').val();
-    var proimage = $('#inputimage').val().replace(/C:\\fakepath\\/i, '');
     var proprice = $('#inputprice').val();
     var proqty = $('#inputqty').val();
     
     var itemData = {
         proname,
-        proimage,
         proprice,
         proqty,
         proid: listItemStorage.length + 1
@@ -92,7 +88,6 @@ $('.store').click(function () {
                 $(".product").append(`<tr>
                 <td>${item.proid}</td>
                 <td>${item.proname}</td>
-                <td><img class="image-content" src="/project/img/${item.proimage}"/></td>
                 <td>${item.proprice}</td>
                 <td>${item.proqty}</td>
                 <td>
@@ -141,7 +136,6 @@ $('.update').click(function () {
     var idEditing = localStorage.getItem('idEditing');
 
     var proname = $('#updatename').val();
-    var proimage = $('#updateimage').val().replace(/C:\\fakepath\\/i, '');
     var proprice = $('#updateprice').val();
     var proqty = $('#updateqty').val();
     if (idEditing) {
@@ -151,7 +145,6 @@ $('.update').click(function () {
             if (item.proid == idEditing) {
                 listItemStorage[i] = {
                     proname,
-                    proimage,
                     proprice,
                     proqty,
                     proid: idEditing
@@ -163,7 +156,6 @@ $('.update').click(function () {
     } else {
         var itemData = {
             proname,
-            proimage,
             proprice,
             proqty,
             proid: listItemStorage.length + 1
