@@ -33,15 +33,19 @@
                         <table>
                             <tr>
                                 <td><label for="">Product Name:</label></td>
-                                <td><input type="text" id="inputname"></td>
+                                <td><input type="text" id="addname"></td>
                             </tr>
                             <tr>
                                 <td><label for="">Product Price:</label></td>
-                                <td><input type="text" id="inputprice"></td>
+                                <td><input type="text" id="addprice"></td>
                             </tr>
                             <tr>
                                 <td><label for="">Product Qty:</label></td>
-                                <td><input type="text" id="inputqty"></td>
+                                <td><input type="text" id="addqty"></td>
+                            </tr>
+                            <tr>
+                                <td><label for="">Manufacturer:</label></td>
+                                <td><input type="text" id="addnsx"></td>
                             </tr>
                         </table>
                         <div class="row">
@@ -68,6 +72,10 @@
                                     <td><label for="">Product Qty:</label></td>
                                     <td><input type="text" id="updateqty"></td>
                                 </tr>
+                                <tr>
+                                    <td><label for="">Product manufacturer:</label></td>
+                                    <td><input type="text" id="updatensx"></td>
+                                </tr>
                             </table>
                             <div class="row">
                                 <button type="button" class="btn btn-success update">Save</button>
@@ -84,8 +92,10 @@
                   <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Image</th>
                     <th scope="col">Price</th>
-                    <th scope="col">Qty</th>
+                    <th scope="col">Qty</th>                    
+                    <th scope="col">Nsx</th>                    
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
