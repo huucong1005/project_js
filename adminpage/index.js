@@ -1,44 +1,53 @@
 // get list item
 function getListItem() {
-    var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
     $(".product").empty();
-    for (let i = 0; i < listItemStorage.length; i++) {
-        var item = listItemStorage[i];
-        $(".product").append(`<tr>
-          <td>${item.proid}</td>
-          <td>${item.proname}</td>
-          <td>${item.proprice}</td>
-          <td>${item.proqty}</td>
+    $.get('https://641c59c91a68dc9e46074003.mockapi.io/v1/product', function (listItemStorage, status) {
+        for (let i = 0; i < listItemStorage.length; i++) {
+            var item = listItemStorage[i];
+            $(".product").append(`<tr>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td><img class="image-content" src="${item.image}"/></td>
+          <td>${item.price}</td>
+          <td>${item.qty}</td>
+          <td>${item.manufacturer}</td>
           <td>
-            <button onclick="openEdit(${item.proid})" type="button" class="btn btn-info open-modal ">Edit</button>
-            <button onclick="removeItem(${item.proid})" type="button" class="btn btn-info">Remove</button>
+            <button onclick="openEditModal(${item.id})" type="button" class="btn btn-info open-modal">Edit</button>
+            <button onclick="removeItem(${item.id})" type="button" class="btn btn-info open-modal">Remove</button>
           </td>
         </tr>`);
-    }
+        }
+    })
 };
-
-//get item edit
-function openEdit(id) {
-    var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
-    var itemChoice = listItemStorage.find(item => item.proid == id);
-    $('#updatename').val(itemChoice.proname);
-    $('#updateprice').val(itemChoice.proprice);
-    $('#updateqty').val(itemChoice.proqty);
-    $('.modal-edit').show();
-    localStorage.setItem('idEditing', id);
-}
 
 //remove item
 function removeItem(id) {
-    var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
-    var itemChoiceIndex = listItemStorage.findIndex(item => item.proid === id);
-    listItemStorage.splice(itemChoiceIndex, 1);
-    localStorage.setItem('listItem', JSON.stringify(listItemStorage));
-    getListItem();
+    $.ajax({
+        url: `https://641c59c91a68dc9e46074003.mockapi.io/v1/product/${id}`, 
+        method: 'DELETE', 
+        success: function (res) {
+            getListItem();
+        }
+    });
 }
 
-$(document).ready(function(){
 
+//get item edit
+function openEditModal(id) {
+    $.get(`https://641c59c91a68dc9e46074003.mockapi.io/v1/product/${id}`, function (itemChoice, status) {
+        $('#updatename').val(itemChoice.name);
+        $('#updateprice').val(itemChoice.price);
+        $('#updateqty').val(itemChoice.qty);
+        $('#updatensx').val(itemChoice.manufacturer);
+
+        localStorage.setItem('idEditing', id);
+        $('.modal-edit').show();
+    });
+}
+
+
+// ===============================================================================================================
+$(document).ready(function(){
 //load js HTMLcomponent
     $(".header").load("/project/adminpage/header.html");
     $(".footer").load("/project/adminpage/footer.html");
@@ -46,64 +55,12 @@ $(document).ready(function(){
 
 // reset form
     function resetForm() {
-        $('#inputname').val('');
-        $('#inputprice').val('');
-        $('#inputqty').val('');
+        $('#addname').val('');
+        $('#addprice').val('');
+        $('#addqty').val('');
     }
 
-// get list item
-    getListItem();
-
-//add new item
-$('.store').click(function () {
-    var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
-
-    var proname = $('#inputname').val();
-    var proprice = $('#inputprice').val();
-    var proqty = $('#inputqty').val();
-    
-    var itemData = {
-        proname,
-        proprice,
-        proqty,
-        proid: listItemStorage.length + 1
-    }
-    $('.modal-add').hide();
-    listItemStorage.push(itemData);
-    localStorage.setItem('listItem', JSON.stringify(listItemStorage));
-    getListItem();     
-    resetForm();           
-});
-
-//search
-    $(".search-button").click(function() {
-        var value_search = $(".search-input").val().toLowerCase();
-        var count =0
-        var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
-        $(".product").empty()
-        for (let i = 0; i < listItemStorage.length; i++) {
-            var item = listItemStorage[i];
-            if (item.proname == value_search) {
-                count+=1
-                $(".product").append(`<tr>
-                <td>${item.proid}</td>
-                <td>${item.proname}</td>
-                <td>${item.proprice}</td>
-                <td>${item.proqty}</td>
-                <td>
-                    <button onclick="openEdit(${item.proid})" type="button" class="btn btn-info open-modal ">Edit</button>
-                    <button onclick="removeItem(${item.proid})" type="button" class="btn btn-info">Remove</button>
-                </td>
-                </tr>`);
-            }
-        }
-        if (count === 0) {
-            alert("no result");
-            getListItem();
-        }
-    });
-
-//show - hide modal
+//show - hide modal add
     $('.addNew').click(function () {
         $('.modal-add').show();
     });
@@ -114,9 +71,11 @@ $('.store').click(function () {
         $('.modal-add').hide();
     });
     $(window).on('click', function (e) {
-      if ($(e.target).is('.modal-add')) {
+    if ($(e.target).is('.modal-add')) {
         $('.modal-add').hide();
-      }
+    }
+    
+//show - hide modal edit
     });
     $('.closeedit').click(function () {
         $('.modal-edit').hide();
@@ -125,49 +84,117 @@ $('.store').click(function () {
         $('.modal-edit').hide();
     });
     $(window).on('click', function (e) {
-      if ($(e.target).is('.modal-edit')) {
+    if ($(e.target).is('.modal-edit')) {
         $('.modal-edit').hide();
-      }
+    }
     });
 
-//----------------edit
+// get list item
+    getListItem();
+
+//add new item
+$('.store').click(function () {
+    var name    =$('#addname').val();
+    var price   =$('#addprice').val();
+    var qty     =$('#addqty').val();
+    var manufacturer     =$('#addnsx').val();
+    
+    var itemData = {
+        name,
+        price,
+        qty,
+        manufacturer
+    }
+
+    $.ajax({
+        url: `https://641c59c91a68dc9e46074003.mockapi.io/v1/product`, 
+        method: 'POST', 
+        data: itemData,
+        success: function (res) {
+            $('.modal-add').hide();
+            getListItem();
+            resetForm(); 
+        }
+    });
+});
+
+//update item
 $('.update').click(function () {
-    var listItemStorage = localStorage.getItem('listItem') ? JSON.parse(localStorage.getItem('listItem')) : [];
     var idEditing = localStorage.getItem('idEditing');
 
-    var proname = $('#updatename').val();
-    var proprice = $('#updateprice').val();
-    var proqty = $('#updateqty').val();
+    var name = $('#updatename').val();
+    var price = $('#updateprice').val();
+    var qty = $('#updateqty').val();
+    var manufacturer = $('#updatensx').val();
+
+            var itemData = {
+            name,
+            price,
+            qty,
+            manufacturer
+        }
+
     if (idEditing) {
         // logic update
-        for (let i = 0; i < listItemStorage.length; i++) {
-            var item = listItemStorage[i];
-            if (item.proid == idEditing) {
-                listItemStorage[i] = {
-                    proname,
-                    proprice,
-                    proqty,
-                    proid: idEditing
-                };
+        $.ajax({
+            url: `https://641c59c91a68dc9e46074003.mockapi.io/v1/product/${idEditing}`,
+            method: 'PUT',
+            data: itemData,
+            success: function (res) {
+                getListItem();
+                localStorage.removeItem('idEditing');
+                console.log(res)
             }
-        }
-        localStorage.removeItem('idEditing');
-        localStorage.setItem('listItem', JSON.stringify(listItemStorage));
+        })
     } else {
-        var itemData = {
-            proname,
-            proprice,
-            proqty,
-            proid: listItemStorage.length + 1
-        }
-        listItemStorage.push(itemData);
-        localStorage.setItem('listItem', JSON.stringify(listItemStorage));
+        $.ajax({
+            url : `https://641c59c91a68dc9e46074003.mockapi.io/v1/product`,
+            method: 'POST',
+            data: itemData,
+            success: function (res) {
+                getListItem();
+                console.log(res)
+            }
+        })
     }
     $('.modal-edit').hide();
     getListItem();
-    resetForm();
 })
 
+
+    
+//search
+    $(".search-button").click(function() {
+        var value_search = $(".search-input").val().trim().toLowerCase();
+        var count =0
+
+        $.get('https://641c59c91a68dc9e46074003.mockapi.io/v1/product', function (listItem, status) {
+            $(".product").empty();
+            for (let i = 0; i < listItem.length; i++) {
+                var item = listItem[i]
+                var search = item.name.toLowerCase().search(value_search)
+                if (search !== -1) {
+                    count+=1;
+                    $(".product").append(`<tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td><img class="image-content" src="${item.image}"/></td>
+                        <td>${item.price}</td>
+                        <td>${item.qty}</td>
+                        <td>${item.manufacturer}</td>
+                        <td>
+                            <button onclick="openEditModal(${item.id})" type="button" class="btn btn-info open-modal">Edit</button>
+                            <button onclick="removeItem(${item.id})" type="button" class="btn btn-info open-modal">Remove</button>
+                        </td>
+                    </tr>`);
+                }
+            }
+            if (count === 0 || value_search =="") {
+                alert("no result");
+                getListItem();
+            }
+        });
+    });
 
 });
 
@@ -196,4 +223,3 @@ $('.update').click(function () {
 //         css('display','table-row').animate({opacity:1}, 300);  
 //     });  
 // });   
-
