@@ -68,6 +68,9 @@
     height: 7rem;
 
 }
+.btn{
+    margin: 3px 0;
+}
 .btn-info  {
     margin-left: 5px;
 }
